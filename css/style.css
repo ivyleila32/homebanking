@@ -82,7 +82,6 @@ body {
             transition: all .6s ease-in-out;
     text-align: left;
     vertical-align: text-bottom;
-
     color: #666;
     border: 0;
     background-color: transparent;
@@ -138,10 +137,6 @@ body {
     border-radius: 8px 8px 0 0;
 }
 
-.color2 {
-    
-}
-
 .color3 {
     border-radius:  0 0 8px 8px;
 }
@@ -191,11 +186,11 @@ body.theme-rosa .tu-cuenta {
 }
 
 body.theme-rosa .primary-container {
-    background-color: #f9f9f9;
+    background-color: #EFF0F4;
 }
 
 body.theme-rosa .secondary-container {
-    color: #f9f9f9;
+    color: #EFF0F4;
     background-color: #FF7A8A;
 }
 

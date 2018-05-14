@@ -1,11 +1,34 @@
 //Declaración de variables
 var storage = window.localStorage;
+/*
 var saldoCuenta = 5000;
 var nombreUsuario = "Ivana";
 var codigo = 1234;
 var limiteExtraccion = 1000;
 var cuentasAmigas = [{ numero: 1234567, nombre: "Cuenta amiga 1" },{numero:7654321,nombre:"cuenta amiga 2"}];
 var movimientos = [];
+*/
+let usuarioActual;
+const multiUsuario = [
+    { 
+        nombreUsuario: "Brunito Pane",
+        alias: 'brunito',
+        contraseña: 12913, 
+        saldoCuenta: 5000, 
+        limiteExtraccion: 1000, 
+        movimientos: [],
+        cuentasAmigas: [{ numero: 333111, nombre: "Juan" }, {numero: 333222,nombre:"Tiago"}]
+    },
+    { 
+        nombreUsuario: "Ivana Di Biase",
+        alias: 'ivana',
+        contraseña: 1234, 
+        saldoCuenta: 15000, 
+        limiteExtraccion: 1000, 
+        movimientos: [],
+        cuentasAmigas: [{ numero: 1234567, nombre: "Cuenta Amiga 1" },{numero:7654321,nombre:"Cuenta Amiga 2"}]
+    }
+];
 
 //Ejecución de las funciones que actualizan los valores de las variables en el HTML
 document.onreadystatechange  = function() {
@@ -18,19 +41,18 @@ document.onreadystatechange  = function() {
 
 //Funciones que tenes que completar
 
-
 function cambiarLimiteDeExtraccion() {
     var monto = prompt("ingrese nuevo limite de extraccion")
     if(monto === null) {
         return;
     }
     monto = parseInt(monto);
-    if (monto > saldoCuenta || monto <= 0) {
+    if (monto > usuarioActual.saldoCuenta || monto <= 0) {
     alert("no se puede realizar la operacion");
         return;
     }
     else{
-        limiteExtraccion = monto;
+        usuarioActual.limiteExtraccion = monto;
     }
     actualizarLimiteEnPantalla();
     alert("el nuevo limite es: " + monto);
@@ -42,11 +64,11 @@ function extraerDinero() {
         return;
     }
     monto = parseInt(monto);
-    var saldoAnterior = saldoCuenta;
-     if (monto > saldoCuenta) { 
+    var saldoAnterior = usuarioActual.saldoCuenta;
+     if (monto > usuarioActual.saldoCuenta) { 
         alert("ALERTA - Saldo Insuficiente."); 
     } 
-    else if ( monto > limiteExtraccion){
+    else if ( monto > usuarioActual.limiteExtraccion){
         alert("ALERTA - Supera el limite de extraccion");
     }
     else if(monto % 100 !== 0 || monto <100) {
@@ -57,8 +79,8 @@ function extraerDinero() {
         actualizarSaldoEnPantalla();
         alert(  "Monto extraido:        " + monto + " \n" + 
                 "Saldo anterior:        " + saldoAnterior + " \n" +     
-                "Saldo actual:        " + saldoCuenta + "\n" );
-        guardarMovimiento("extraccion", monto, saldoCuenta);
+                "Saldo actual:        " + usuarioActual.saldoCuenta + "\n" );
+        guardarMovimiento("extraccion", monto, usuarioActual.saldoCuenta);
     }
    
 }
@@ -71,7 +93,7 @@ function depositarDinero() {
         alert("ALERTA - Ingrese Valores Numericos.");
     } }
     monto = parseInt(monto);  
-    var saldoAnterior = saldoCuenta;
+    var saldoAnterior = usuarioActual.saldoCuenta;
     if(isNaN(monto)) {
         alert("ALERTA - Ingrese Valores Numericos.");
     }  
@@ -79,9 +101,9 @@ function depositarDinero() {
 
     alert(  "Monto depositado:        " + monto + " \n" + 
             "Saldo anterior:        " + saldoAnterior + " \n" +
-            "Saldo actual:        " + saldoCuenta + "\n" );
+            "Saldo actual:        " + usuarioActual.saldoCuenta + "\n" );
     actualizarSaldoEnPantalla();
-    guardarMovimiento("deposito", monto, saldoCuenta);
+    guardarMovimiento("deposito", monto, usuarioActual.saldoCuenta);
 }
 
 function pagarServicio() {
@@ -91,8 +113,8 @@ function pagarServicio() {
             serviLuz = 210,
             serviInternet = 570;
     var ejOpcion = function(monto, menu) {
-        var saldoAnterior =  saldoCuenta;
-         if(saldoCuenta < monto) {
+        var saldoAnterior =  usuarioActual.saldoCuenta;
+         if(usuarioActual.saldoCuenta < monto) {
             alert( "saldo insuficiente");  
         }
         else {
@@ -100,9 +122,9 @@ function pagarServicio() {
             alert( "se ha pagado el servicio :" + menu + " \n" +   
                     "saldo anterior :       " + saldoAnterior + " \n" + 
                     "valor del servicio pagado:        " + monto + " \n" +
-                    "Saldo actual:          " + saldoCuenta + "\n" );
+                    "Saldo actual:          " + usuarioActual.saldoCuenta + "\n" );
             actualizarSaldoEnPantalla();
-            guardarMovimiento("pago de servicio", monto, saldoCuenta);
+            guardarMovimiento("pago de servicio", monto, usuarioActual.saldoCuenta);
             
         }
     };        
@@ -112,7 +134,7 @@ function pagarServicio() {
         menu += "3: lUZ \n";
         menu += "4: INTERNET \n";
     var opcion = prompt(menu);
-    if(monto === null) {
+    if(opcion === null) {
         return;
     }
     switch (opcion) {
@@ -136,16 +158,16 @@ function pagarServicio() {
 
 function transferirDinero() {
     var nroCuenta = prompt("ingrese el nro de cuenta a la cual quiere transferir");
-    if(monto === null) {
+    if(nroCuenta === null) {
         return;
     }
     nroCuenta = parseInt(nroCuenta);
-    var saldoAnterior = saldoCuenta;
+    var saldoAnterior = usuarioActual.saldoCuenta;
     var cuentaExiste = false;
     
     // Busco si existe la cuenta
-    for (i=0; i<cuentasAmigas.length;i++) {
-        var obj = cuentasAmigas[i];
+    for (i=0; i<usuarioActual.cuentasAmigas.length;i++) {
+        const obj = usuarioActual.cuentasAmigas[i];
         if(obj.numero === nroCuenta) {
             cuentaExiste = obj;
         }
@@ -154,16 +176,16 @@ function transferirDinero() {
         // Transfiero los fondos
         var  transferir = prompt("ingrese el monto a tranferir");
         transferir = parseInt(transferir);
-        if(transferir > saldoCuenta) {
+        if(transferir > usuarioActual.saldoCuenta) {
             alert("saldo de cuenta insuficiente");
         }
         else {
             restarSaldo(transferir);
             alert( "el monto transferido es de :" + transferir + " \n" +   
                     "saldo anterior :       " + saldoAnterior + " \n" +
-                    "Saldo actual:          " + saldoCuenta + "\n" +
+                    "Saldo actual:          " + usuarioActual.saldoCuenta + "\n" +
                     "cuenta destino:          " + cuentaExiste.numero + " - " + cuentaExiste.nombre + "\n" );
-            guardarMovimiento("transferencia", transferir, saldoCuenta);
+            guardarMovimiento("transferencia", transferir, usuarioActual.saldoCuenta);
             actualizarSaldoEnPantalla();
                             
         }
@@ -173,53 +195,54 @@ function transferirDinero() {
     }
     
 }
-    
-function iniciarSesion(saldoRetenido = false) {
-    var ingreso = prompt("ingrese su contraseña");
-    ingreso = parseInt(ingreso);
-
-    if  (codigo == ingreso) {
-        if (saldoRetenido !== false) {
-            saldoCuenta = saldoRetenido;
+function buscarUsuario(usuario,contraseña){
+    for (let i = 0; i < multiUsuario.length; i++) {
+        const element = multiUsuario[i];
+        // console.log(usuario, contraseña);
+        // console.log(element);
+        if(usuario == element.alias && contraseña == element.contraseña){
+            return element;
         }
-        alert("Bienvenido/a " + nombreUsuario + " ya puedes comenzar a utilizar tus operaciones");
+    }
+    return false;
+}
+    
+function iniciarSesion() {
+    let usuario;
+    const nombreUsuario = prompt("Ingrese usuario");
+    let ingreso = prompt("ingrese su contraseña");
+    ingreso = parseInt(ingreso);
+    if  (usuario = buscarUsuario(nombreUsuario, ingreso)) {
+        usuarioActual = usuario;
+        alert("Bienvenido/a " + usuarioActual.nombreUsuario + " ya puedes comenzar a utilizar tus operaciones");
         cargarNombreEnPantalla();
         actualizarSaldoEnPantalla();
         actualizarLimiteEnPantalla();
     }    
     else {
         var error = alert("la contraseña es incorrecta");    
-        var retenido;
-        if (saldoRetenido === false) {
-            retenido = saldoCuenta;
-        }
-        else {
-            retenido = saldoRetenido;
-        }
-        
-        saldoCuenta = 0;
-        actualizarSaldoEnPantalla();
-        var msg = alert("el saldo de su cuenta ha sido retenido por seguridad");
-        iniciarSesion(retenido);
+        // actualizarSaldoEnPantalla();
+        // var msg = alert("el saldo de su cuenta ha sido retenido por seguridad");
+        iniciarSesion();
     }
-    
 }    
 
 //suma plata
 function sumarSaldo(monto) {
-    saldoCuenta += monto;
+    usuarioActual.saldoCuenta += monto;
 
 }
 //resta plata 
 function restarSaldo(monto) {
-    saldoCuenta -= monto;
+    usuarioActual.saldoCuenta -= monto;
 }
 //muestras los movimientos realizados a lo largo de la sesion
 function verMovimientos() {
      var msg = "Movimientos realizados \n";
     msg += "Nro | Movimiento | Monto | SaldoCuenta\n";            
-    for (i=0; i <movimientos.length;i++) {
-      msg += i +" | "+ movimientos[i].movimiento +" | "+ movimientos[i].monto +" | "+ movimientos[i].saldo + "\n";
+    for (i=0; i <usuarioActual.movimientos.length;i++) {
+        const mov = usuarioActual.movimientos[i];
+        msg += i +" | "+ mov.movimiento +" | "+ mov.monto +" | "+ mov.saldo + "\n";
         
     }
     alert(msg); 
@@ -231,7 +254,7 @@ function guardarMovimiento(movimiento, monto, saldo){
         monto: monto, 
         saldo: saldo
     };
-    movimientos.push(obj);
+    usuarioActual.movimientos.push(obj);
 }
 
 //cambia los colores 
@@ -267,16 +290,17 @@ function aplicarTema() {
     }
 }
 
+
 //Funciones que actualizan el valor de las variables en el HTML
 function cargarNombreEnPantalla() {
-    document.getElementById("nombre").innerHTML = "Bienvenido/a " + nombreUsuario;
+    document.getElementById("nombre").innerHTML = "Bienvenido/a " + usuarioActual.nombreUsuario;
 }
 
 function actualizarSaldoEnPantalla() {
-    document.getElementById("saldo-cuenta").innerHTML = "$" + saldoCuenta;
+    document.getElementById("saldo-cuenta").innerHTML = "$" + usuarioActual.saldoCuenta;
 }
 
 function actualizarLimiteEnPantalla() {
-    document.getElementById("limite-extraccion").innerHTML = "Tu límite de extracción es: $" + limiteExtraccion;
+    document.getElementById("limite-extraccion").innerHTML = "Tu límite de extracción es: $" + usuarioActual.limiteExtraccion;
 }
 
