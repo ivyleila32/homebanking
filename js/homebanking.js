@@ -9,7 +9,7 @@ var cuentasAmigas = [{ numero: 1234567, nombre: "Cuenta amiga 1" },{numero:76543
 var movimientos = [];
 */
 let usuarioActual;
-const multiUsuario = [
+var multiUsuario ; /*[
     { 
         nombreUsuario: "Brunito Pane",
         alias: 'brunito',
@@ -28,14 +28,16 @@ const multiUsuario = [
         movimientos: [],
         cuentasAmigas: [{ numero: 1234567, nombre: "Cuenta Amiga 1" },{numero:7654321,nombre:"Cuenta Amiga 2"}]
     }
-];
+];*/
 
 //Ejecución de las funciones que actualizan los valores de las variables en el HTML
 document.onreadystatechange  = function() {
     if (document.readyState == "interactive") {
         // Initialize your application or run some code.
+        cargarMultiUsuario();
         iniciarSesion();
         aplicarTema();
+      
     }   
 }
 
@@ -56,6 +58,7 @@ function cambiarLimiteDeExtraccion() {
     }
     actualizarLimiteEnPantalla();
     alert("el nuevo limite es: " + monto);
+    guardarMultiUser();
 }
 
 function extraerDinero() {
@@ -82,7 +85,7 @@ function extraerDinero() {
                 "Saldo actual:        " + usuarioActual.saldoCuenta + "\n" );
         guardarMovimiento("extraccion", monto, usuarioActual.saldoCuenta);
     }
-   
+ 
 }
 
 function depositarDinero() {
@@ -104,6 +107,7 @@ function depositarDinero() {
             "Saldo actual:        " + usuarioActual.saldoCuenta + "\n" );
     actualizarSaldoEnPantalla();
     guardarMovimiento("deposito", monto, usuarioActual.saldoCuenta);
+
 }
 
 function pagarServicio() {
@@ -126,7 +130,7 @@ function pagarServicio() {
             actualizarSaldoEnPantalla();
             guardarMovimiento("pago de servicio", monto, usuarioActual.saldoCuenta);
             
-        }
+        }    
     };        
     var menu = "Ingrese el numero que corresponda con el servicio que quieres pagar: \n";
         menu += "1: AGUA \n";
@@ -154,6 +158,7 @@ function pagarServicio() {
             alert("ERROR - Opcion invalida.");
             break;
     }
+    
 }
 
 function transferirDinero() {
@@ -189,12 +194,14 @@ function transferirDinero() {
             actualizarSaldoEnPantalla();
                             
         }
+        
     } 
     else {
         alert("cuenta amiga no encontrada");
     }
-    
+
 }
+
 function buscarUsuario(usuario,contraseña){
     for (let i = 0; i < multiUsuario.length; i++) {
         const element = multiUsuario[i];
@@ -224,6 +231,7 @@ function iniciarSesion() {
         // actualizarSaldoEnPantalla();
         // var msg = alert("el saldo de su cuenta ha sido retenido por seguridad");
         iniciarSesion();
+
     }
 }    
 
@@ -242,7 +250,7 @@ function verMovimientos() {
     msg += "Nro | Movimiento | Monto | SaldoCuenta\n";            
     for (i=0; i <usuarioActual.movimientos.length;i++) {
         const mov = usuarioActual.movimientos[i];
-        msg += i +" | "+ mov.movimiento +" | "+ mov.monto +" | "+ mov.saldo + "\n";
+        msg += i+1 +" | "+ mov.movimiento +" | "+ mov.monto +" | "+ mov.saldo + "\n";
         
     }
     alert(msg); 
@@ -255,6 +263,7 @@ function guardarMovimiento(movimiento, monto, saldo){
         saldo: saldo
     };
     usuarioActual.movimientos.push(obj);
+    guardarMultiUser();    
 }
 
 //cambia los colores 
@@ -264,14 +273,11 @@ function cambiarTema() {
 }
 // setea el tema
 function asignarTema(tema) {
-    storage.setItem('theme', tema);
+    usuarioActual.tema = tema;
     aplicarTema();
 }
 function aplicarTema() {
-    if(!storage.getItem('theme')){
-        storage.setItem('theme','verde');
-    }
-    const tema = storage.getItem('theme');
+    const tema = usuarioActual.tema;
     switch (tema) {
         case "verde":
             document.body.classList.remove('theme-azul','theme-rosa');
@@ -288,8 +294,43 @@ function aplicarTema() {
         default:
             break;
     }
+    guardarMultiUser();
 }
 
+
+function cargarMultiUsuario(){
+  if(!storage.getItem('multiUsuario')){
+    storage.setItem('multiUsuario', JSON.stringify([
+        { 
+            nombreUsuario: "Brunito Pane",
+            alias: 'brunito',
+            contraseña: 12913, 
+            saldoCuenta: 5000, 
+            limiteExtraccion: 1000, 
+            movimientos: [],
+            cuentasAmigas: [{ numero: 333111, nombre: "Juan" }, {numero: 333222,nombre:"Tiago"}],
+            tema: 'verde'
+        },
+        { 
+            nombreUsuario: "Ivana Di Biase",
+            alias: 'ivana',
+            contraseña: 1234, 
+            saldoCuenta: 15000, 
+            limiteExtraccion: 1000, 
+            movimientos: [],
+            cuentasAmigas: [{ numero: 1234567, nombre: "Cuenta Amiga 1" },{numero:7654321,nombre:"Cuenta Amiga 2"}],
+            tema: 'verde'
+        }
+    ]));
+  }
+ multiUsuario = JSON.parse(storage.getItem('multiUsuario'));
+  
+}
+
+function guardarMultiUser(){
+    storage.setItem('multiUsuario',JSON.stringify(multiUsuario));
+
+}
 
 //Funciones que actualizan el valor de las variables en el HTML
 function cargarNombreEnPantalla() {
